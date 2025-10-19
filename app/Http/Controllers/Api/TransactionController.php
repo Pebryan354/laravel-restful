@@ -49,6 +49,7 @@ class TransactionController extends Controller
                 'h.description',
                 'h.rate_euro',
                 'h.date_paid',
+                'd.id as detail_id',
                 'd.name',
                 'd.value_idr',
                 'c.name as category_name'
@@ -172,7 +173,42 @@ class TransactionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id) {}
+    public function show(string $id)
+    {
+        $transaction = TransactionHeader::with('details')->find($id);
+
+        if (!$transaction) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Transaksi tidak ditemukan',
+                'error' => 'process'
+            ], 404);
+        }
+
+        // kembalikan data dalam bentuk JSON rapi
+        return response()->json([
+            'success' => true,
+            'message' => 'Data transaksi',
+            'data' => [
+                'id' => $transaction->id,
+                'code' => $transaction->code,
+                'description' => $transaction->description,
+                'rate_euro' => $transaction->rate_euro,
+                'date_paid' => $transaction->date_paid,
+                'created_at' => $transaction->created_at,
+                'details' => $transaction->details->map(function ($d) {
+                    return [
+                        'id' => $d->id,
+                        'transaction_id' => $d->transaction_id,
+                        'transaction_category_id' => $d->transaction_category_id,
+                        'name' => $d->name,
+                        'value_idr' => $d->value_idr,
+                        'created_at' => $d->created_at,
+                    ];
+                }),
+            ]
+        ]);
+    }
 
     /**
      * Update the specified resource in storage.
@@ -184,7 +220,7 @@ class TransactionController extends Controller
         if (!$transaction) {
             return response()->json([
                 'success' => false,
-                'message' => 'Transaction not found',
+                'message' => 'Transaksi tidak ditemukan',
                 'error' => 'process'
             ], 404);
         }
@@ -290,9 +326,9 @@ class TransactionController extends Controller
         DB::beginTransaction();
 
         try {
-            $transaction = TransactionHeader::find($id);
+            $transactionDetail = TransactionDetail::find($id);
 
-            if (!$transaction) {
+            if (!$transactionDetail) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Data tidak ditemukan',
@@ -300,9 +336,7 @@ class TransactionController extends Controller
                 ], 404);
             }
 
-            $transaction->details()->delete();
-
-            $transaction->delete();
+            $transactionDetail->delete();
 
             DB::commit();
 
