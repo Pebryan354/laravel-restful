@@ -23,6 +23,7 @@ class TransactionController extends Controller
         $orderDir   = $request->get('order_dir', 'asc');
         $start_date = $request->get('start_date');
         $end_date   = $request->get('end_date');
+        $category   = $request->get('category');
 
         $orderMap = [
             'code'          => 'h.code',
@@ -67,6 +68,10 @@ class TransactionController extends Controller
 
         if ($start_date && $end_date) {
             $query->whereBetween('h.date_paid', [$start_date, $end_date]);
+        }
+
+        if ($category) {
+            $query->where('c.name', 'like', "%{$category}%");
         }
 
         $total = $query->count();
