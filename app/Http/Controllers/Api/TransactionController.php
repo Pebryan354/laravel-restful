@@ -371,6 +371,7 @@ class TransactionController extends Controller
         $endDate    = $request->input('end_date');
         $orderBy    = $request->input('order_by', 'date');
         $orderDir   = strtolower($request->input('order_dir', 'desc')) === 'desc' ? 'desc' : 'asc';
+        $category   = $request->get('category');
 
         $allowedOrder = ['date', 'category', 'value_idr'];
         if (!in_array($orderBy, $allowedOrder)) {
@@ -394,6 +395,10 @@ class TransactionController extends Controller
         if ($search) {
             $search = trim($search);
             $query->havingRaw('(category LIKE ? OR date LIKE ?)', ["%{$search}%", "%{$search}%"]);
+        }
+
+        if ($category) {
+            $query->where('mc.name', 'like', "%{$category}%");
         }
 
         $countQuery = clone $query;
