@@ -21,6 +21,8 @@ class TransactionController extends Controller
         $search = $request->get('search');
         $orderBy    = $request->get('order_by', 'id');
         $orderDir   = $request->get('order_dir', 'asc');
+        $start_date = $request->get('start_date');
+        $end_date   = $request->get('end_date');
 
         $orderMap = [
             'code'          => 'h.code',
@@ -42,6 +44,7 @@ class TransactionController extends Controller
             ->join('transaction_detail as d', 'h.id', '=', 'd.transaction_id')
             ->leftJoin('ms_category as c', 'd.transaction_category_id', '=', 'c.id')
             ->select(
+                'h.id',
                 'h.code',
                 'h.description',
                 'h.rate_euro',
@@ -59,6 +62,10 @@ class TransactionController extends Controller
                     ->orWhere('d.name', 'like', "%{$search}%")
                     ->orWhere('c.name', 'like', "%{$search}%");
             });
+        }
+
+        if ($start_date && $end_date) {
+            $query->whereBetween('h.date_paid', [$start_date, $end_date]);
         }
 
         $total = $query->count();
