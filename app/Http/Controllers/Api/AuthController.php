@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -38,24 +38,36 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required|string|min:6'
+            'password' => 'required|string'
+        ], [
+            'email.required' => 'Email tidak boleh kosong',
+            'email.email' => 'Email harus format email',
+            'password.required' => 'Password tidak boleh kosong',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi Gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
         $user = User::where('email', $credentials['email'])->first();
         if (! $user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Email tidak terdaftar.',
-            ], 404);
+            ], 422);
         }
 
         if (! Hash::check($credentials['password'], $user->password)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Password salah.',
-            ], 401);
+            ], 422);
         }
 
         if (! $token = auth('api')->attempt($credentials)) {
@@ -85,11 +97,11 @@ class AuthController extends Controller
     public function refresh()
     {
         try {
-            if (! $oldToken = auth('api')->getToken()) {
+            if (! auth('api')->getToken()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Token tidak ditemukan dalam header Authorization'
-                ], 401);
+                ], 422);
             }
 
             $newToken = auth('api')->refresh();
@@ -103,7 +115,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Token tidak valid atau sudah expired, silakan login kembali.'
-            ], 401);
+            ], 500);
         }
     }
 }
