@@ -71,8 +71,9 @@ class CategoryController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi Gagal',
-                'errors' => $validator->errors()
+                'message' => 'Silahkan periksa kembali inputan anda',
+                'error' => 'validation',
+                'data' => $validator->errors()
             ], 422);
         }
 
@@ -106,8 +107,9 @@ class CategoryController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi Gagal',
-                'errors' => $validator->errors()
+                'message' => 'Silahkan periksa kembali inputan anda',
+                'error' => 'validation',
+                'data' => $validator->errors()
             ], 422);
         }
 

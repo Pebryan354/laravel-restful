@@ -117,8 +117,9 @@ class TransactionController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi Gagal',
-                'errors' => $validator->errors()
+                'message' => 'Silahkan periksa kembali inputan anda',
+                'error' => 'validation',
+                'data' => $validator->errors()
             ], 422);
         }
 
@@ -176,7 +177,8 @@ class TransactionController extends Controller
         if (!$transaction) {
             return response()->json([
                 'success' => false,
-                'message' => 'Transaction not found'
+                'message' => 'Transaction not found',
+                'error' => 'process'
             ], 404);
         }
 
@@ -210,8 +212,9 @@ class TransactionController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors()
+                'message' => 'Silahkan periksa kembali inputan anda',
+                'error' => 'validation',
+                'data' => $validator->errors()
             ], 422);
         }
 
@@ -266,7 +269,8 @@ class TransactionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal memperbarui data',
-                'error' => $e->getMessage()
+                'error' => 'process',
+                'data' => $e->getMessage()
             ], 500);
         }
     }
@@ -284,7 +288,8 @@ class TransactionController extends Controller
             if (!$transaction) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Data tidak ditemukan'
+                    'message' => 'Data tidak ditemukan',
+                    'error' => 'process'
                 ], 404);
             }
 
@@ -304,7 +309,8 @@ class TransactionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menghapus Data',
-                'error' => $e->getMessage()
+                'error' => 'process',
+                'data' => $e->getMessage()
             ], 500);
         }
     }

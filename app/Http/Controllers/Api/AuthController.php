@@ -50,8 +50,9 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasi Gagal',
-                'errors' => $validator->errors()
+                'message' => 'Silahkan periksa kembali inputan anda',
+                'error' => 'validation',
+                'data' => $validator->errors()
             ], 422);
         }
 
@@ -60,6 +61,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Email tidak terdaftar.',
+                'error' => 'process'
             ], 422);
         }
 
@@ -67,6 +69,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Password salah.',
+                'error' => 'process'
             ], 422);
         }
 
@@ -74,6 +77,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal membuat token. Silakan coba lagi.',
+                'error' => 'process'
             ], 500);
         }
 
@@ -100,7 +104,8 @@ class AuthController extends Controller
             if (! auth('api')->getToken()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Token tidak ditemukan dalam header Authorization'
+                    'message' => 'Token tidak ditemukan dalam header Authorization',
+                    'error' => 'process'
                 ], 422);
             }
 
@@ -114,7 +119,8 @@ class AuthController extends Controller
         } catch (JWTException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token tidak valid atau sudah expired, silakan login kembali.'
+                'message' => 'Token tidak valid atau sudah expired, silakan login kembali.',
+                'error' => 'process'
             ], 500);
         }
     }
