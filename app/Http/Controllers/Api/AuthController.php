@@ -28,9 +28,10 @@ class AuthController extends Controller
         $token = auth('api')->login($user);
 
         return response()->json([
+            'success' => true,
             'message' => 'User created successfully',
-            'user' => $user,
-            'token' => $token
+            'token' => $token,
+            'user' => $user
         ], 201);
     }
 
