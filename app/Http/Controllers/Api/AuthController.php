@@ -13,11 +13,28 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users',
             'password' => 'required|string|min:6',
+        ], [
+            'name.required' => 'Nama tidak boleh kosong',
+            'name.max' => 'Nama tidak boleh lebih dari 255 karakter',
+            'email.required' => 'Email tidak boleh kosong',
+            'email.email' => 'Email harus format email',
+            'email.unique' => 'Email sudah terdaftar',
+            'password.required' => 'Password tidak boleh kosong',
+            'password.min' => 'Password minimal 6 karakter',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Silahkan periksa kembali inputan anda',
+                'error' => 'validation',
+                'data' => $validator->errors()
+            ], 422);
+        }
 
         $user = User::create([
             'name' => $request->name,
