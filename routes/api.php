@@ -13,6 +13,7 @@ Route::post('/refresh', [AuthController::class, 'refresh']);
 Route::middleware('jwt.auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    Route::get('/me', [UserController::class, 'me']);
     Route::apiResource('users', UserController::class);
 
     Route::get('/recap', [TransactionController::class, 'recap']);
